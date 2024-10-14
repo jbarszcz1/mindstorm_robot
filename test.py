@@ -18,12 +18,34 @@ s3 = ColorSensor(INPUT_3)
 sign = 1
 speed = 25
 
+
 while True:
-	##m1.on(sign*speed)
-	##m2.on(sign*speed)
-	## m3.on(sign*speed)
-	## sign = - sign
-	## print('Button ' + ('pressed.' if s1.is_pressed else 'not pressed.'))
-	print('Color 1 ' + str(s2.rgb) + ' detected as ' + str(s2.color_name) + '.')
-	print('Color 2 ' + str(s3.rgb) + ' detected as ' + str(s3.color_name) + '.')
-	sleep(1.0)
+    print('Color 1 ' + str(s2.rgb) + ' detected as ' + str(s2.color_name) + '.')
+    print('Color 2 ' + str(s3.rgb) + ' detected as ' + str(s3.color_name) + '.')
+    sleep(0.1)
+    if(str(s2.color_name) != 'Black' and str(s3.color_name) != 'Black'):
+		
+        speed = 10
+        m1.on(sign*speed)
+        m2.on(sign*speed)
+    if(str(s2.color_name) == 'Black' and str(s3.color_name) != 'Black'):
+    
+        speed = 5
+        speed1= 5
+        m1.on(sign*speed1)
+        m2.on(-sign*speed)
+        sleep(0.3)
+    if(str(s2.color_name) != 'Black' and str(s3.color_name) == 'Black'):
+    
+        speed = 5
+        speed1= 5
+        m1.on(-sign*speed)
+        m2.on(sign*speed1)
+        sleep(0.3)
+        
+    if(str(s2.color_name) == 'Black' and str(s3.color_name) == 'Black'):
+    
+        speed = 10
+        m1.on(sign*speed)
+        m2.on(sign*speed)
+        
