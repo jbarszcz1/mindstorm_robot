@@ -22,30 +22,32 @@ speed = 25
 while True:
     print('Color 1 ' + str(s2.rgb) + ' detected as ' + str(s2.color_name) + '.')
     print('Color 2 ' + str(s3.rgb) + ' detected as ' + str(s3.color_name) + '.')
-    sleep(0.1)
-    if(str(s2.color_name) != 'Black' and str(s3.color_name) != 'Black'):
-		
-        speed = 10
-        m1.on(sign*speed)
-        m2.on(sign*speed)
-    if(str(s2.color_name) == 'Black' and str(s3.color_name) != 'Black'):
-    
-        speed = 5
-        speed1= 5
-        m1.on(sign*speed1)
-        m2.on(-sign*speed)
-        sleep(0.3)
-    if(str(s2.color_name) != 'Black' and str(s3.color_name) == 'Black'):
-    
-        speed = 5
-        speed1= 5
-        m1.on(-sign*speed)
-        m2.on(sign*speed1)
-        sleep(0.3)
-        
-    if(str(s2.color_name) == 'Black' and str(s3.color_name) == 'Black'):
-    
-        speed = 10
-        m1.on(sign*speed)
-        m2.on(sign*speed)
-        
+    sleep(0.07)
+    red = s2.red
+    blue = s2.blue
+    green = s2.green
+    margin = 110
+    color2 = s2.color_name
+
+    if red < margin and green < margin and blue < margin:
+        color2 = 'Black'    
+    if str(color2) != 'Black' and str(s3.color_name) != 'Black':
+        speed = 15
+        m1.on(sign * speed)
+        m2.on(sign * speed)
+    if str(color2) == 'Black' and str(s3.color_name) != 'Black':
+        speed = 12
+        speed1 = 12
+        m1.on(sign * speed1)
+        m2.on(-sign * speed)
+        sleep(0.05)
+    if str(color2) != 'Black' and str(s3.color_name) == 'Black':
+        speed = 12
+        speed1 = 12
+        m1.on(-sign * speed)
+        m2.on(sign * speed1)
+        sleep(0.05)
+    if str(color2) == 'Black' and str(s3.color_name) == 'Black':
+        speed = 15
+        m1.on(sign * speed)
+        m2.on(sign * speed)
