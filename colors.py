@@ -47,3 +47,4 @@ while True:
 	#	color3 = 'Black'
     print("prawy czujnik wskazuje: "+color3 )
     print(str(red) + " "+str(green) + " "+str(blue))
+    sleep(2)
