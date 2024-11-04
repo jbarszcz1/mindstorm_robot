@@ -30,7 +30,7 @@ def follow_the_line():
     blue_prawy = s3.blue
     green_prawy = s3.green
     margin = 65
-    margin_prawy = 45
+    margin_prawy = 20
     color2 = s2.color_name
     color3 = s3.color_name
 
@@ -38,13 +38,10 @@ def follow_the_line():
         color2 = 'Black'    
     
     if red_prawy < margin_prawy or green_prawy < margin_prawy or blue_prawy < margin_prawy:
-        color3 = 'Black'
-
-    #if red_prawy < 45 and green_prawy < 45 and blue_prawy < 45:  # Czarny
-       # return 'Black'
+        color3 = "Black"
 
     if str(color2) != 'Black' and str(color3) != 'Black':
-        speed = 7.5
+        speed = 10
         m1.on(sign * speed)
         m2.on(sign * speed)
     if str(color2) == 'Black' and str(color3) != 'Black':
@@ -52,13 +49,13 @@ def follow_the_line():
         speed1 = 12
         m1.on(sign * speed1)
         m2.on(-sign * speed)
-        sleep(0.1)
+        sleep(0.15)
     if str(color2) != 'Black' and str(color3) == 'Black':
         speed = 12
         speed1 = 12
         m1.on(-sign * speed)
         m2.on(sign * speed1)
-        sleep(0.1)
+        sleep(0.15)
     if str(color2) == 'Black' and str(color3) == 'Black':
         speed = 10
         m1.on(sign * speed)

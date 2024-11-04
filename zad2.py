@@ -1,166 +1,97 @@
 #!/usr/bin/env python3
 
 from time import sleep
+from ev3dev2.motor import LargeMotor, MediumMotor, OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3
+from ev3dev2.sensor.lego import ColorSensor
 
-from ev3dev2.motor import LargeMotor, MediumMotor, OUTPUT_A, OUTPUT_B, OUTPUT_C,OUTPUT_D
-
-from ev3dev2.sensor import INPUT_1, INPUT_2,INPUT_3
-from ev3dev2.sensor.lego import TouchSensor, ColorSensor
-
+# Inicjalizacja silników i czujników
 m1 = LargeMotor(OUTPUT_A)
 m2 = LargeMotor(OUTPUT_B)
 m3 = MediumMotor(OUTPUT_D)
 
-## s1 = TouchSensor(INPUT_1)
 s2 = ColorSensor(INPUT_2)
 s3 = ColorSensor(INPUT_3)
 
-
+# Definicje prędkości
+LINE_FOLLOW_SPEED = 10
+TURN_SPEED = 12
+RED_FOUND_SPEED = 10
+GREEN_FOUND_SPEED = 10
 
 def follow_the_line():
+    """Funkcja do śledzenia linii."""
 
-    sign = 1
-    print('Color 1 ' + str(s2.rgb) + ' detected as ' + str(s2.color_name) + '.')
-    print('Color 2 ' + str(s3.rgb) + ' detected as ' + str(s3.color_name) + '.')
-    #sleep(0.02)
-    red = s2.red
-    blue = s2.blue
-    green = s2.green
-    red_prawy = s3.red
-    blue_prawy = s3.blue
-    green_prawy = s3.green
-    margin = 65
-    margin_prawy = 45
-    color2 = s2.color_name
-    color3 = s3.color_name
 
-    if red < margin or green < margin or blue < margin:
-        color2 = 'Black'    
-    
-    if red_prawy < margin_prawy or green_prawy < margin_prawy or blue_prawy < margin_prawy:
-        color3 = "Black"
+    color_left = detect_color(s2)
+    color_right = detect_color(s3)
 
-    if str(color2) != 'Black' and str(color3) != 'Black':
-        speed = 10
-        m1.on(sign * speed)
-        m2.on(sign * speed)
-    if str(color2) == 'Black' and str(color3) != 'Black':
-        speed = 12
-        speed1 = 12
-        m1.on(sign * speed1)
-        m2.on(-sign * speed)
-        sleep(0.15)
-    if str(color2) != 'Black' and str(color3) == 'Black':
-        speed = 12
-        speed1 = 12
-        m1.on(-sign * speed)
-        m2.on(sign * speed1)
-        sleep(0.15)
-    if str(color2) == 'Black' and str(color3) == 'Black':
-        speed = 10
-        m1.on(sign * speed)
-        m2.on(sign * speed)
+    if color_left == 'Black' and color_right != 'Black':
+        turn(TURN_SPEED, -TURN_SPEED)
+    elif color_left != 'Black' and color_right == 'Black':
+        turn(-TURN_SPEED, TURN_SPEED)
+    else:
+        move_forward(LINE_FOLLOW_SPEED)
 
+def detect_color(sensor):
+    """Detekcja koloru na podstawie wartości RGB."""
+    red = sensor.red
+    green = sensor.green
+    blue = sensor.blue
+
+    if red < 45 and green < 45 and blue < 45:  # Czarny
+        return 'Black'
+    elif green > 60 and red < 50 and blue < 50:  # Zielony
+        return 'Green'
+    elif red > 60 and green < 50 and blue < 50:  # Czerwony
+        return 'Red'
+    elif red > 60 and green > 60 and blue > 60:  # Biały
+        return 'White'
+    else:
+        return str(sensor.color_name)
+
+def move_forward(speed):
+    """Porusza robot do przodu z określoną prędkością."""
+    m1.on(speed)
+    m2.on(speed)
+
+def turn(speed_left, speed_right):
+    """Obrót robota."""
+    m1.on(speed_left)
+    m2.on(speed_right)
+    sleep(0.15)  # czas obrotu
 
 def red_found():
-
-        sign = 1
-        speed = 10
-        m1.on(sign * speed)
-        m2.on(sign * speed)
-        sleep(0.5)
-        medium_motor_sign = -1
-        medium_motor_speed = 2
-        m3.on(medium_motor_sign*medium_motor_speed)        
-        speed = 0
-        m1.on(sign * speed)
-        m2.on(sign * speed)
-        sleep(0.5)
-
+    """Akcje do wykonania po znalezieniu czerwonego koloru."""
+    move_forward(RED_FOUND_SPEED)
+    sleep(0.5)
+    m3.on(-2)  # ruch silnika medium
+    stop_motors()
 
 def green_found():
+    """Akcje do wykonania po znalezieniu zielonego koloru."""
+    m3.on(GREEN_FOUND_SPEED)
+    stop_motors()
 
-        sign = 1
-        medium_motor_sign = 1
-        medium_motor_speed = 10
-        m3.on(medium_motor_sign*medium_motor_speed)
-        
-        speed = 0
-        m1.on(sign * speed)
-        m2.on(sign * speed)
-
-        sleep(0.5)
-
-podnoszenie = 0
-obrót =0
-wyjazd_red1=0
-wyjazd_red=0
-raz_zakrec = 0
-zachaczyl_green = 0
+def stop_motors():
+    """Zatrzymuje wszystkie silniki."""
+    m1.off()
+    m2.off()
 
 while True:
-    red = s2.red
-    blue = s2.blue
-    green = s2.green
-    margin = 70
-    color2 = s2.color_name
-    if red < margin or green < margin or blue < margin:
-        color2 = 'Black'  
-    sign = 1
-    if str(s2.color_name) == 'Red' and str(s3.color_name) != 'Red' and wyjazd_red==0: 
-        speed = 7
-        speed1 = 8
-        m1.on(sign * speed1)
-        m2.on(-sign * speed)
+    color_left = detect_color(s2)
+    color_right = detect_color(s3)
+
+    if color_left == 'Red' and color_right != 'Red':
+        turn(-7, 8)
         sleep(1)
-    elif str(s2.color_name) != 'Red' and str(s3.color_name) == 'Red' and wyjazd_red==0:
-        speed = 7
-        speed1 = 8
-        m1.on(-sign * speed)
-        m2.on(sign * speed1)
+    elif color_left != 'Red' and color_right == 'Red':
+        turn(8, -7)
         sleep(1)
-    elif str(s2.color_name) == 'Red' and str(s3.color_name) == 'Red' and podnoszenie==0:
+    elif color_left == 'Red' and color_right == 'Red':
         red_found()
-        podnoszenie=1
-    elif podnoszenie==1 and obrót==0:
-        speed = 15
-        m1.on(-sign * speed)
-        m2.on(sign * speed)
-        sleep(2.4)
-        obrót=1
-        speed = 10
-        m1.on(sign * speed)
-        m2.on(sign * speed)
-        sleep(0.8)
-        wyjazd_red=1
-        wyjazd_red1=1
-        raz_zakrec = 1
-    elif raz_zakrec == 1 and str(s2.color_name) == 'Black' and str(s3.color_name) == 'Black': 
-        speed = 5
-        speed1 = 8
-        m1.on(-sign * speed)
-        m2.on(sign * speed1)
-        sleep(2)
-        raz_zakrec = 0
-    elif str(s2.color_name) == 'Green' and str(s3.color_name) == 'Green' and podnoszenie and zachaczyl_green:
+    elif color_left == 'Green' and color_right == 'Green':
         green_found()
-        
         break
-    elif str(s2.color_name) == 'Green' and str(s3.color_name) != 'Green' and wyjazd_red1==1 : 
-        speed = 5
-        speed1 = 8
-        m1.on(sign * speed1)
-        m2.on(-sign * speed)
-        zachaczyl_green = 1
-        sleep(0.5)
-    elif str(s2.color_name) != 'Green' and str(s3.color_name) == 'Green' and wyjazd_red1==1:
-        speed = 5
-        speed1 = 8
-        m1.on(-sign * speed)
-        m2.on(sign * speed1)
-        zachaczyl_green = 1
-        sleep(0.5)
     else:
         follow_the_line()
-        wyjazd_red=0
-
